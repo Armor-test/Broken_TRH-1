@@ -6,7 +6,7 @@
   "dependencies": {
     "axios": "^0.21.4",
     "dangerously-set-html-content": "^1.0.8",
-    "get-browser-fingerprint": "^2.0.1",
+    "get-browser-fingerprint": "^2.1.1",
     "history": "^4.10.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
