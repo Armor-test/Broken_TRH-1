@@ -99,6 +99,32 @@ export class AuthController {
     return this.loginWithRSAJwtKeys(req, res);
   }
 
+    @Post('/admin/logg')
+  @ApiCreatedResponse({
+    type: LoginResponse,
+  })
+  @ApiUnauthorizedResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        error: { type: 'string' },
+        location: { type: 'string' },
+      },
+    },
+    description: 'invalid credentials',
+  })
+  @ApiOperation({
+    description: SWAGGER_DESC_LOGIN_WITH_RSA_JWT_KEYS,
+  })
+  async loginWithRSAJwtKeysAdmin(
+    @Body() req: LoginRequest,
+    @Res({ passthrough: true }) res: FastifyReply,
+  ): Promise<LoginResponse> {
+    this.logger.debug('Call loginWithRSAJwtKeysAdmin');
+    return this.loginWithRSAJwtKeys(req, res);
+  }
+
+  
   @Post('login')
   @UseGuards(CsrfGuard)
   @ApiCreatedResponse({
