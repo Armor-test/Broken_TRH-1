@@ -26,7 +26,7 @@ export class FileService {
         throw new Error(`no such file or directory, access '${file}'`);
       }
     } else {
-      file = path.resolve(process.cwd(), file);
+      file = this.resolveWithinRoot(file, process.cwd());
 
       await fs.promises.access(file, R_OK);
 
@@ -40,9 +40,28 @@ export class FileService {
     } else if (file.startsWith('http')) {
       throw new Error('cannot delete file from this location');
     } else {
-      file = path.resolve(process.cwd(), file);
+      file = this.resolveWithinRoot(file, process.cwd());
       await fs.promises.unlink(file);
       return true;
     }
+  }
+
+  /**
+   * Resolves `file` relative to `root` and ensures the normalized result
+   * stays within `root`, rejecting paths that escape it via traversal
+   * sequences (e.g. "../"). Prevents path/directory traversal (CWE-22/23/36).
+   */
+  private resolveWithinRoot(file: string, root: string): string {
+    const resolvedRoot = path.resolve(root);
+    const resolved = path.resolve(resolvedRoot, file);
+
+    if (
+      resolved !== resolvedRoot &&
+      !resolved.startsWith(resolvedRoot + path.sep)
+    ) {
+      throw new Error(`Invalid file path: ${file}`);
+    }
+
+    return resolved;
   }
 }
