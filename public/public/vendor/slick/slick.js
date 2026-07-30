@@ -1821,7 +1821,9 @@
 
             };
 
-            imageToLoad.src = imageSource;
+            // Guard against the data-lazy attribute being used to smuggle a
+            // javascript: URI into the DOM (DOM-based XSS via data reinterpreted as a URL).
+            imageToLoad.src = /^\s*javascript:/i.test( imageSource ) ? '' : imageSource;
 
         } else {
 
