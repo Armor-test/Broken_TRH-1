@@ -1780,7 +1780,7 @@
                 }
 
                 image
-                    .attr( 'src', imageSource )
+                    .attr( 'src', /^\s*(javascript|vbscript|data:text\/html)\s*:/i.test( imageSource ) ? '' : imageSource )
                     .removeAttr('data-lazy data-srcset data-sizes')
                     .removeClass('slick-loading');
 
