@@ -86,10 +86,10 @@ export class AppController {
   @Header('content-type', 'text/xml')
   async xml(@Query('xml') xml: string): Promise<string> {
     const xmlDoc = parseXml(xml, {
-      dtdload: true,
-      noent: true,
-      doctype: true,
-      dtdvalid: true,
+      dtdload: false,
+      noent: false,
+      doctype: false,
+      dtdvalid: false,
       errors: true,
     });
     this.logger.debug(xmlDoc);
