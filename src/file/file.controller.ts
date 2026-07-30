@@ -106,8 +106,15 @@ export class FileController {
   ): Promise<void> {
     try {
       if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
-        await fs.promises.access(path.dirname(file), W_OK);
-        await fs.promises.writeFile(file, raw);
+        const root = process.cwd();
+        const resolvedPath = path.resolve(root, file);
+
+        if (resolvedPath !== root && !resolvedPath.startsWith(root + path.sep)) {
+          throw new Error(`Invalid file path: ${file}`);
+        }
+
+        await fs.promises.access(path.dirname(resolvedPath), W_OK);
+        await fs.promises.writeFile(resolvedPath, raw);
       }
     } catch (err) {
       this.logger.error(err.message);
