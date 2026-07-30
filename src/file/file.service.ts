@@ -26,7 +26,12 @@ export class FileService {
         throw new Error(`no such file or directory, access '${file}'`);
       }
     } else {
-      file = path.resolve(process.cwd(), file);
+      const root = process.cwd();
+      file = path.resolve(root, file);
+
+      if (file !== root && !file.startsWith(root + path.sep)) {
+        throw new Error(`no such file or directory, access '${file}'`);
+      }
 
       await fs.promises.access(file, R_OK);
 
@@ -40,7 +45,13 @@ export class FileService {
     } else if (file.startsWith('http')) {
       throw new Error('cannot delete file from this location');
     } else {
-      file = path.resolve(process.cwd(), file);
+      const root = process.cwd();
+      file = path.resolve(root, file);
+
+      if (file !== root && !file.startsWith(root + path.sep)) {
+        throw new Error('cannot delete file from this location');
+      }
+
       await fs.promises.unlink(file);
       return true;
     }
