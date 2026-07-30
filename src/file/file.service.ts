@@ -5,18 +5,32 @@ import * as path from 'path';
 import { CloudProvidersMetaData } from './cloud.providers.metadata';
 import { R_OK } from 'constants';
 
+const FILE_ROOT = path.resolve(process.cwd());
+
 @Injectable()
 export class FileService {
   private readonly logger = new Logger(FileService.name);
   private cloudProviders = new CloudProvidersMetaData();
 
+  private isWithinRoot(resolvedPath: string): boolean {
+    return (
+      resolvedPath === FILE_ROOT || resolvedPath.startsWith(FILE_ROOT + path.sep)
+    );
+  }
+
   async getFile(file: string): Promise<Stream> {
     this.logger.log(`Reading file: ${file}`);
 
     if (file.startsWith('/')) {
-      await fs.promises.access(file, R_OK);
+      const resolved = path.resolve(file);
 
-      return fs.createReadStream(file);
+      if (!this.isWithinRoot(resolved)) {
+        throw new Error(`no such file or directory, access '${file}'`);
+      }
+
+      await fs.promises.access(resolved, R_OK);
+
+      return fs.createReadStream(resolved);
     } else if (file.startsWith('http')) {
       const content = await this.cloudProviders.get(file);
 
@@ -26,11 +40,15 @@ export class FileService {
         throw new Error(`no such file or directory, access '${file}'`);
       }
     } else {
-      file = path.resolve(process.cwd(), file);
+      const resolved = path.resolve(process.cwd(), file);
 
-      await fs.promises.access(file, R_OK);
+      if (!this.isWithinRoot(resolved)) {
+        throw new Error(`no such file or directory, access '${file}'`);
+      }
 
-      return fs.createReadStream(file);
+      await fs.promises.access(resolved, R_OK);
+
+      return fs.createReadStream(resolved);
     }
   }
 
@@ -40,8 +58,13 @@ export class FileService {
     } else if (file.startsWith('http')) {
       throw new Error('cannot delete file from this location');
     } else {
-      file = path.resolve(process.cwd(), file);
-      await fs.promises.unlink(file);
+      const resolved = path.resolve(process.cwd(), file);
+
+      if (!this.isWithinRoot(resolved)) {
+        throw new Error('cannot delete file from this location');
+      }
+
+      await fs.promises.unlink(resolved);
       return true;
     }
   }
