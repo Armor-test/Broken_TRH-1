@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
 
 @Injectable()
 export class CloudProvidersMetaData {
@@ -268,11 +267,9 @@ export class CloudProvidersMetaData {
     } else if (providerUrl.startsWith(CloudProvidersMetaData.AZURE)) {
       return this.providers.get(CloudProvidersMetaData.AZURE);
     } else {
-      const { data } = await axios(providerUrl, {
-        timeout: 5000,
-        responseType: 'text',
-      });
-      return data;
+      throw new Error(
+        'Unsupported cloud provider metadata endpoint requested',
+      );
     }
   }
 }
