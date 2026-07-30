@@ -1970,6 +1970,14 @@
 			var $element = $(element), image,
                 url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src') || $element.attr('data-srcset');
 
+			// The url comes from a data-src(-retina)/data-srcset attribute in
+			// the DOM, which may be attacker-controlled. Reject values that
+			// use a script-executing scheme (e.g. "javascript:") before they
+			// are written back into the DOM as a src/srcset attribute.
+			if (url && /^\s*javascript:/i.test(url)) {
+				url = '';
+			}
+
 			this._core.trigger('load', { element: $element, url: url }, 'lazy');
 
 			if ($element.is('img')) {
