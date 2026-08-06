@@ -1557,7 +1557,7 @@
                             }
 
                             image
-                                .attr('src', imageSource)
+                                .attr('src', /^\s*javascript:/i.test(imageSource) ? '' : imageSource)
                                 .animate({ opacity: 1 }, 200, function() {
                                     image
                                         .removeAttr('data-lazy data-srcset data-sizes')
