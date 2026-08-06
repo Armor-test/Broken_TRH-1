@@ -9,14 +9,24 @@ import { R_OK } from 'constants';
 export class FileService {
   private readonly logger = new Logger(FileService.name);
   private cloudProviders = new CloudProvidersMetaData();
+  private readonly rootDir = path.resolve(process.cwd());
 
   async getFile(file: string): Promise<Stream> {
     this.logger.log(`Reading file: ${file}`);
 
     if (file.startsWith('/')) {
-      await fs.promises.access(file, R_OK);
+      const resolvedPath = path.normalize(file);
 
-      return fs.createReadStream(file);
+      if (
+        resolvedPath !== this.rootDir &&
+        !resolvedPath.startsWith(this.rootDir + path.sep)
+      ) {
+        throw new Error(`no such file or directory, access '${file}'`);
+      }
+
+      await fs.promises.access(resolvedPath, R_OK);
+
+      return fs.createReadStream(resolvedPath);
     } else if (file.startsWith('http')) {
       const content = await this.cloudProviders.get(file);
 
