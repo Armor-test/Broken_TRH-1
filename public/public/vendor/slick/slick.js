@@ -1579,7 +1579,9 @@
 
                 };
 
-                imageToLoad.src = imageSource;
+                if (!/^\s*(javascript|data):/i.test(imageSource)) {
+                    imageToLoad.src = imageSource;
+                }
 
             });
 
