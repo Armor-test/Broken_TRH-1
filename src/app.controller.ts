@@ -125,6 +125,14 @@ export class AppController {
 
     return new Promise((res, rej) => {
       try {
+        // Only allow a safe, restricted set of characters in the command
+        // line to prevent shell metacharacters / arbitrary argument
+        // injection from being smuggled in via the query parameter.
+        if (!/^[\w\-./ ]+$/.test(command)) {
+          rej('Invalid command');
+          return;
+        }
+
         const [exec, ...args] = command.split(' ');
         const ps = spawn(exec, args);
 
