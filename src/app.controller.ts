@@ -55,7 +55,11 @@ export class AppController {
   async renderTemplate(@Body() raw): Promise<string> {
     if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
       const text = raw.toString().trim();
-      const res = dotT.compile(text)();
+      // The user-provided text must never be compiled as a doT template
+      // itself (that would let a client inject arbitrary doT/JS syntax and
+      // have it executed). Instead, use a fixed, non-user-controlled
+      // template and pass the input purely as escaped interpolation data.
+      const res = dotT.compile('{{!it.text}}')({ text });
       this.logger.debug(`Rendered template: ${res}`);
       return res;
     }
