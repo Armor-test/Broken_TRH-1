@@ -10477,7 +10477,9 @@ return jQuery;
     var $links;
 
     if (dataLightboxValue) {
-      $links = $($link.prop('tagName') + '[data-lightbox="' + dataLightboxValue + '"]');
+      $links = $($link.prop('tagName')).filter(function() {
+        return $(this).attr('data-lightbox') === dataLightboxValue;
+      });
       for (var i = 0; i < $links.length; i = ++i) {
         addToAlbum($($links[i]));
         if ($links[i] === $link[0]) {
