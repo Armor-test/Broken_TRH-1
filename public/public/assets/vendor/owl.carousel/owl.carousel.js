@@ -1970,6 +1970,13 @@
 			var $element = $(element), image,
                 url = (window.devicePixelRatio > 1 && $element.attr('data-src-retina')) || $element.attr('data-src') || $element.attr('data-srcset');
 
+			// Reject unsafe URL schemes (e.g. `javascript:`, `vbscript:`) read from
+			// `data-src`/`data-src-retina`/`data-srcset` attributes before they are
+			// ever written back into the DOM as `src`/`srcset`/`background-image`.
+			if (url && /^\s*(?:javascript|vbscript|data:text\/html):/i.test(url)) {
+				url = undefined;
+			}
+
 			this._core.trigger('load', { element: $element, url: url }, 'lazy');
 
 			if ($element.is('img')) {
