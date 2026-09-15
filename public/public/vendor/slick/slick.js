@@ -1541,6 +1541,12 @@
                     imageSizes  = $(this).attr('data-sizes') || _.$slider.attr('data-sizes'),
                     imageToLoad = document.createElement('img');
 
+                // Reject dangerous URL schemes (e.g. javascript:, data:, vbscript:) before
+                // this attacker-influenced value is ever assigned to a src attribute.
+                if (typeof imageSource !== 'string' || /^\s*(javascript|data|vbscript):/i.test(imageSource)) {
+                    return;
+                }
+
                 imageToLoad.onload = function() {
 
                     image
