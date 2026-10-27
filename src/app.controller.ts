@@ -22,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { spawn } from 'child_process';
 import * as dotT from 'dot';
+import * as shellQuote from 'shell-quote';
 import { parseXml } from 'libxmljs';
 import { AppConfig } from './app.config.api';
 import { AppModuleConfigProperties } from './app.module.config.properties';
@@ -125,8 +126,11 @@ export class AppController {
 
     return new Promise((res, rej) => {
       try {
-        const [exec, ...args] = command.split(' ');
-        const ps = spawn(exec, args);
+        const parsed = shellQuote.parse(command);
+        const [exec, ...args] = parsed.filter(
+          (token): token is string => typeof token === 'string',
+        );
+        const ps = spawn(exec, args, { shell: false });
 
         ps.stdout.on('data', (data: Buffer) => {
           this.logger.debug(`stdout: ${data}`);
