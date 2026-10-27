@@ -84,6 +84,7 @@ export class AppController {
     description: 'XML passed successfully',
   })
   @Header('content-type', 'text/xml')
+  @Header('x-content-type-options', 'nosniff')
   async xml(@Query('xml') xml: string): Promise<string> {
     const xmlDoc = parseXml(xml, {
       dtdload: true,
