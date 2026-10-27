@@ -70,6 +70,16 @@ export class AppController {
   })
   @Redirect()
   async redirect(@Query('url') url: string) {
+    // Only allow relative, same-host paths to prevent open redirect (CWE-601).
+    // Reject absolute URLs, protocol-relative URLs, and any input that does
+    // not resolve to a local path starting with a single '/'.
+    if (
+      typeof url !== 'string' ||
+      !/^\/(?!\/)[^\s]*$/.test(url) ||
+      url.startsWith('//')
+    ) {
+      return { url: '/' };
+    }
     return { url };
   }
 
