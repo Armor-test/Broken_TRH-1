@@ -106,8 +106,22 @@ export class FileController {
   ): Promise<void> {
     try {
       if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
-        await fs.promises.access(path.dirname(file), W_OK);
-        await fs.promises.writeFile(file, raw);
+        if (typeof file !== 'string' || file.startsWith('http')) {
+          throw new Error('invalid file path');
+        }
+
+        const baseDir = process.cwd();
+        const resolved = path.resolve(baseDir, file);
+
+        if (
+          resolved !== baseDir &&
+          !resolved.startsWith(baseDir + path.sep)
+        ) {
+          throw new Error('cannot write file to this location');
+        }
+
+        await fs.promises.access(path.dirname(resolved), W_OK);
+        await fs.promises.writeFile(resolved, raw);
       }
     } catch (err) {
       this.logger.error(err.message);
