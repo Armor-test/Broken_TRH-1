@@ -2355,6 +2355,9 @@ function extend(destination, source, recursive) {
     recursive = recursive || false;
 
     for (var attrName in source) {
+        if (attrName === '__proto__' || attrName === 'constructor' || attrName === 'prototype') {
+            continue;
+        }
         if (source.hasOwnProperty(attrName)) {
             var destVal = destination[attrName];
             var sourceVal = source[attrName];
