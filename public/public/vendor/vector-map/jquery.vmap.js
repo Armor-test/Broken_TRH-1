@@ -195,7 +195,7 @@ var JQVMap = function (params) {
 
     code = code.toLowerCase();
 
-    jQuery(params.container).trigger(mapClickEvent, [code, mapData.paths[code].name]);
+    params.container.trigger(mapClickEvent, [code, mapData.paths[code].name]);
 
     if ( !params.multiSelectRegion && !mapClickEvent.isDefaultPrevented()) {
       for (var keyPath in mapData.paths) {
