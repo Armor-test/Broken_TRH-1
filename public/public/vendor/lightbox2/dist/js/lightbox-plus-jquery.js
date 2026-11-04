@@ -5819,7 +5819,19 @@ function remove( elem, selector, keepData ) {
 
 jQuery.extend( {
 	htmlPrefilter: function( html ) {
-		return html.replace( rxhtmlTag, "<$1></$2>" );
+		return html.replace( rxhtmlTag, function( match, tag, tagName ) {
+
+			// Only expand the self-closing tag when its content contains no
+			// quote characters; a match that spans a quoted attribute value
+			// (e.g. due to an unbalanced quote inside sanitized input) must
+			// not be rewritten, since doing so can re-introduce markup that
+			// was previously neutralized. See CVE-2020-11022/CVE-2020-11023.
+			if ( tag.indexOf( "\"" ) > -1 || tag.indexOf( "'" ) > -1 ) {
+				return match;
+			}
+
+			return "<" + tag + "></" + tagName + ">";
+		} );
 	},
 
 	clone: function( elem, dataAndEvents, deepDataAndEvents ) {
