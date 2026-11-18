@@ -164,7 +164,7 @@ export class AuthController {
     if (!fp) {
       throw new BadRequestException('Fingerprint  header is required');
     }
-    const token = createHash('md5').update(fp).digest('hex');
+    const token = createHash('sha256').update(fp).digest('hex');
 
     res.setCookie(this.CSRF_COOKIE_HEADER, token, {
       httpOnly: true,
